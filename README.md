@@ -1,14 +1,14 @@
-ENC Recipes
+# ENC Recipes
 
 ENC Recipes is a community-driven recipe and food-focused social application built as an Elixir project within the Elixir Nigeria Community (ENC).
 
-Problem Statement
+## Problem Statement
 
 ENC is a community made up of people from different backgrounds and interests who communicate and collaborate for various purposes. However, there is no dedicated platform focused specifically on food, recipes, food culture, and connecting people within the food ecosystem.
 
 This creates an opportunity to build a focused community where people can share their recipes, discover different food cultures, connect with others who share similar interests, and collaborate around food.
 
-Solution
+## Solution
 
 ENC Recipes aims to address this problem by providing a dedicated social platform for the food ecosystem.
 
@@ -22,13 +22,13 @@ Build a community around food and cooking
 
 The project is designed to combine recipe management with social interaction, creating a space where food enthusiasts, creators, and other members of the community can connect and learn from one another.
 
-Architecture
+## Architecture
 
 ENC Recipes follows a Modular Monolith architecture and applies principles of Domain-Driven Design (DDD).
 
 The application is organized around business domains, with each domain responsible for a specific area of the application's functionality. This approach helps keep the codebase maintainable, encourages clear separation of responsibilities, and makes the system easier to evolve as new features are introduced.
 
-Technology Stack
+## Technology Stack
 Frontend
 Hologram — UI development and frontend implementation
 Backend
@@ -97,4 +97,3 @@ Learn More
   Community
 
 ENC Recipes is an Elixir Nigeria Community project built to encourage collaboration, learning, and experimentation within the Elixir ecosystem.
-# enc_recipe_app
