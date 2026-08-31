@@ -52,6 +52,10 @@ config :recipe_app, RecipeAppWeb.Endpoint,
 # configured to run both http and https servers on
 # different ports.
 
+# config/dev.exs
+
+config :recipe_app, RecipeApp.Mailer, adapter: Swoosh.Adapters.Local
+
 # Reload browser tabs when matching files change.
 config :recipe_app, RecipeAppWeb.Endpoint,
   live_reload: [

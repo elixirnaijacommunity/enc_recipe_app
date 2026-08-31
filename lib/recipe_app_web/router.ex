@@ -20,6 +20,14 @@ defmodule RecipeAppWeb.Router do
     get "/", PageController, :home
   end
 
+  scope "/api/v1", RecipeAppWeb do
+    pipe_through :api
+
+    post "/auth/signup", AuthController, :signup
+    post "/auth/login", AuthController, :login
+    get "/auth/verify-email", AuthController, :verify_email
+  end
+
   # Other scopes may use custom stacks.
   # scope "/api", RecipeAppWeb do
   #   pipe_through :api
