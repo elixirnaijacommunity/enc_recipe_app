@@ -11,6 +11,9 @@ config :recipe_app,
   ecto_repos: [RecipeApp.Repo],
   generators: [timestamp_type: :utc_datetime]
 
+config :hologram,
+  otp_app: :recipe_app
+
 # Configure the endpoint
 config :recipe_app, RecipeAppWeb.Endpoint,
   url: [host: "localhost"],
