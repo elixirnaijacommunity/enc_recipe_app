@@ -38,4 +38,4 @@ npm-debug.log
 /priv/static/hologram/
 
 /elixir_report.txt
-
+.elixir_ls/*

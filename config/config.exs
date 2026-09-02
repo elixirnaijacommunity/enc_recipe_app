@@ -34,6 +34,10 @@ config :recipe_app, RecipeAppWeb.Endpoint,
 # at the `config/runtime.exs`.
 config :recipe_app, RecipeApp.Mailer, adapter: Swoosh.Adapters.Local
 
+# Configure Hologram
+config :hologram,
+  otp_app: :recipe_app
+
 # Configure esbuild (the version is required)
 config :esbuild,
   version: "0.25.4",
