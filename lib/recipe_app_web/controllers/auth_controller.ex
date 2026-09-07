@@ -1,7 +1,16 @@
 defmodule RecipeAppWeb.AuthController do
   use RecipeAppWeb, :controller
 
+  @moduledoc """
+  The AuthController handles user authentication and account management.
+  """
+
   alias RecipeApp.Accounts
+  action_fallback RecipeAppWeb.FallbackController
+
+  @doc """
+  Handles user signup by creating a new user account and sending a verification email.
+  """
 
   def signup(conn, params) do
     case Accounts.register_user(params) do
@@ -20,23 +29,20 @@ defmodule RecipeAppWeb.AuthController do
         })
 
       {:error, changeset} ->
-        conn
-        |> put_status(:unprocessable_entity)
-        |> json(%{
-          error: "Unable to create account",
-          details:
-            Ecto.Changeset.traverse_errors(
-              changeset,
-              fn {message, _opts} -> message end
-            )
-        })
+        {:error, changeset}
     end
   end
+
+  @doc """
+  Handles user login by authenticating the provided email and password.
+  If successful, it creates a session and returns user information.
+  """
 
   def login(conn, %{"email" => email, "password" => password}) do
     case Accounts.authenticate_user(email, password) do
       {:ok, user} ->
         conn
+        |> configure_session(renew: true)
         |> put_session(:user_id, user.id)
         |> json(%{
           message: "Login successful",
@@ -79,6 +85,9 @@ defmodule RecipeAppWeb.AuthController do
     })
   end
 
+  @doc """
+  Handles user logout by clearing the session.
+  """
   def verify_email(conn, %{"token" => token}) do
     case Accounts.verify_email(token) do
       {:ok, _user} ->
@@ -100,5 +109,13 @@ defmodule RecipeAppWeb.AuthController do
           error: "User not found"
         })
     end
+  end
+
+  def verify_email(conn, _params) do
+    conn
+    |> put_status(:bad_request)
+    |> json(%{
+      error: "Token is required"
+    })
   end
 end

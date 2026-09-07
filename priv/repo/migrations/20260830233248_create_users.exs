@@ -3,10 +3,10 @@ defmodule RecipeApp.Repo.Migrations.CreateUsers do
 
   def change do
     create table(:users) do
-      add :email, :string
-      add :password_hash, :string
-      add :username, :string
-      add :status, :string, default: "pending"
+      add :email, :string, null: false
+      add :password_hash, :string, null: false
+      add :username, :string, null: false
+      add :status, :string, null: false, default: "pending"
       add :email_verified_at, :utc_datetime
 
       timestamps(type: :utc_datetime)

@@ -52,7 +52,10 @@ defmodule RecipeAppWeb.AuthControllerTest do
              "message" => "Email verified successfully"
            }
 
-    assert Repo.get!(User, user.id).status == "active"
+    verified_user = Repo.get!(User, user.id)
+
+    assert verified_user.status == "active"
+    assert verified_user.email_verified_at
 
     login_conn =
       build_conn()
@@ -62,5 +65,32 @@ defmodule RecipeAppWeb.AuthControllerTest do
       })
 
     assert %{"message" => "Login successful"} = json_response(login_conn, 200)
+    assert %{"message" => "Login successful"} = json_response(login_conn, 200)
+    assert get_session(login_conn, :user_id) == user.id
+  end
+
+  test "returns 400 when verification token is missing", %{conn: conn} do
+    conn = get(conn, ~p"/api/v1/auth/verify-email")
+
+    assert json_response(conn, 400) == %{
+             "error" => "Token is required"
+           }
+  end
+
+  test "returns 422 when email is invalid", %{conn: conn} do
+    params = %{
+      "email" => "nature@@example.com",
+      "username" => "nature",
+      "password" => "password123"
+    }
+
+    conn = post(conn, ~p"/api/v1/auth/signup", params)
+
+    assert %{
+             "error" => "Unable to process request",
+             "details" => %{
+               "email" => ["is invalid"]
+             }
+           } = json_response(conn, 422)
   end
 end
