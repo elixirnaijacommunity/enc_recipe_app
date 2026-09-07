@@ -65,7 +65,6 @@ defmodule RecipeAppWeb.AuthControllerTest do
       })
 
     assert %{"message" => "Login successful"} = json_response(login_conn, 200)
-    assert %{"message" => "Login successful"} = json_response(login_conn, 200)
     assert get_session(login_conn, :user_id) == user.id
   end
 
@@ -92,5 +91,30 @@ defmodule RecipeAppWeb.AuthControllerTest do
                "email" => ["is invalid"]
              }
            } = json_response(conn, 422)
+  end
+
+  test "pending user cannot log in before verifying email", %{conn: conn} do
+    params = %{
+      "email" => "nature@example.com",
+      "username" => "nature",
+      "password" => "password123"
+    }
+
+    signup_conn =
+      post(conn, ~p"/api/v1/auth/signup", params)
+
+    assert %{"message" => "Account created successfully. Please check your email."} =
+             json_response(signup_conn, 201)
+
+    login_conn =
+      build_conn()
+      |> post(~p"/api/v1/auth/login", %{
+        "email" => "nature@example.com",
+        "password" => "password123"
+      })
+
+    assert %{
+             "error" => "Please verify your email before logging in."
+           } = json_response(login_conn, 403)
   end
 end

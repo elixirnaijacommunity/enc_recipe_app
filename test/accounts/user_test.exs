@@ -3,10 +3,10 @@ defmodule RecipeApp.Accounts.UserTest do
 
   alias RecipeApp.Accounts.User
 
-  describe "registration_changeset/2" do
+  describe "changeset/2" do
     test "normalizes email before storing it" do
       changeset =
-        User.registration_changeset(%User{}, %{
+        User.changeset(%User{}, %{
           email: " Nature@Example.COM ",
           username: "nature",
           password: "password123"
@@ -18,7 +18,7 @@ defmodule RecipeApp.Accounts.UserTest do
 
     test "rejects an email with multiple @ characters" do
       changeset =
-        User.registration_changeset(%User{}, %{
+        User.changeset(%User{}, %{
           email: "nature@@example.com",
           username: "nature",
           password: "password123"
@@ -31,7 +31,7 @@ defmodule RecipeApp.Accounts.UserTest do
 
     test "rejects a password shorter than 8 characters" do
       changeset =
-        User.registration_changeset(%User{}, %{
+        User.changeset(%User{}, %{
           email: "nature@example.com",
           username: "nature",
           password: "short"

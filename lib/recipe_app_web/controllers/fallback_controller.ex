@@ -13,7 +13,7 @@ defmodule RecipeAppWeb.FallbackController do
       details:
         Ecto.Changeset.traverse_errors(
           changeset,
-          fn {message, _opts} -> message end
+          &RecipeAppWeb.CoreComponents.translate_error/1
         )
     })
   end
