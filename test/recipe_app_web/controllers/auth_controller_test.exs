@@ -117,4 +117,48 @@ defmodule RecipeAppWeb.AuthControllerTest do
              "error" => "Please verify your email before logging in."
            } = json_response(login_conn, 403)
   end
+
+  test "returns 401 when login credentials are invalid", %{conn: conn} do
+    params = %{
+      "email" => "nature@example.com",
+      "username" => "nature",
+      "password" => "password123"
+    }
+
+    signup_conn = post(conn, ~p"/api/v1/auth/signup", params)
+
+    assert %{"message" => "Account created successfully. Please check your email."} =
+             json_response(signup_conn, 201)
+
+    test_pid = self()
+
+    assert_email_sent(fn email ->
+      send(test_pid, {:verification_email, email})
+      true
+    end)
+
+    assert_receive {:verification_email, email}
+
+    [_, verification_url] =
+      Regex.run(
+        ~r/href="([^"]+\/api\/v1\/auth\/verify-email\?token=[^"]+)"/,
+        email.html_body
+      )
+
+    uri = URI.parse(verification_url)
+    verification_path = uri.path <> "?" <> uri.query
+
+    build_conn() |> get(verification_path)
+
+    login_conn =
+      build_conn()
+      |> post(~p"/api/v1/auth/login", %{
+        "email" => "nature@example.com",
+        "password" => "wrong-password"
+      })
+
+    assert json_response(login_conn, 401) == %{
+             "error" => "Invalid email or password"
+           }
+  end
 end

@@ -37,5 +37,10 @@ npm-debug.log
 
 /priv/static/hologram/
 
+# Project-specific and local dev files
 /elixir_report.txt
-.elixir_ls/*
+.elixir_ls/
+.env
+*.pem
+*.key
+config/prod.secret.exs
