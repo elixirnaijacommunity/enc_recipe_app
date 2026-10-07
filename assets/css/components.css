@@ -96,13 +96,23 @@
   font-size: 14px;
   line-height: 1.5;
   box-shadow: none;
-  --input-color: var(--line);
+  --input-color: var(--field-border);
 
   &:focus, &:focus-within {
     border-color: var(--chili);
     outline: 2px solid var(--chili);
     outline-offset: 2px;
     box-shadow: none;
+  }
+
+  /* Keep invalid borders distinct from normal and focused field styles. */
+  &:is(.input-error, .select-error, .textarea-error) {
+    --input-color: var(--color-error);
+    border-color: var(--color-error);
+
+    &:focus, &:focus-within {
+      outline-color: var(--color-error);
+    }
   }
 
   &::placeholder { color: var(--ink-soft); }

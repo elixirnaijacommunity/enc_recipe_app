@@ -83,8 +83,11 @@ defmodule RecipeAppWebHologram.Pages.Components do
         </div>
         <div class="flex flex-wrap gap-6">
           <label class="flex items-center gap-2"><input type="checkbox" /> Vegetarian</label>
-          <label class="flex items-center gap-2"><input type="radio" name="difficulty" checked /> Easy</label>
-          <label class="flex items-center gap-2"><input type="radio" name="difficulty" /> Medium</label>
+          <fieldset class="flex flex-wrap gap-6">
+            <legend class="sr-only">Difficulty</legend>
+            <label class="flex items-center gap-2"><input type="radio" name="difficulty" checked /> Easy</label>
+            <label class="flex items-center gap-2"><input type="radio" name="difficulty" /> Medium</label>
+          </fieldset>
         </div>
       </section>
 

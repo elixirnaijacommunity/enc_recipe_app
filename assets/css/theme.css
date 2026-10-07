@@ -9,7 +9,7 @@
   --color-base-200: var(--parchment);
   --color-base-300: var(--parchment-2);
   --color-base-content: var(--ink);
-  --color-primary: var(--chili);
+  --color-primary: var(--chili-action);
   --color-primary-content: var(--white);
   --color-secondary: var(--turmeric);
   --color-secondary-content: var(--ink);
@@ -25,7 +25,7 @@
   --color-success-content: var(--ink);
   --color-warning: var(--turmeric);
   --color-warning-content: var(--ink);
-  --color-error: var(--chili);
+  --color-error: var(--chili-dark);
   --color-error-content: var(--white);
 
   --radius-selector: 0.25rem;
