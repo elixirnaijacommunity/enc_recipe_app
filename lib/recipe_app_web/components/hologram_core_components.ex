@@ -33,7 +33,7 @@ defmodule RecipeAppWebHologram.HologramCoreComponents do
     def template do
       ~HOLO"""
       <button type={@type}
-        class="btn {@class} rounded-full btn-xs sm:btn-sm md:btn-md"
+        class="btn {@class}"
         ...{@rest}>
         <slot />
       </button>
@@ -52,7 +52,7 @@ defmodule RecipeAppWebHologram.HologramCoreComponents do
       ~HOLO"""
       <input
         type={@type}
-        class="input {@class} rounded-full input-xs sm:input-sm md:input-md"
+        class="input {@class}"
         ...{@rest} />
       """
     end
@@ -132,7 +132,7 @@ defmodule RecipeAppWebHologram.HologramCoreComponents do
       <header class="pb-4 {@class}">
         <h1 class="text-lg font-semibold leading-8"><slot /></h1>
         {%if @subtitle != ""}
-          <p class="text-sm text-base-content/70">{@subtitle}</p>
+          <p class="text-sm text-ink-soft">{@subtitle}</p>
         {/if}
       </header>
       """

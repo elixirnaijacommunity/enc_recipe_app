@@ -1,0 +1,55 @@
+/* Palette from enc_recipes_current_design_system.pdf. This is the source of truth. */
+@layer base {
+  :root {
+    --ink: #1B1712;
+    --ink-soft: #6E6153;
+    --parchment: #F1E6D2;
+    --parchment-2: #E7D6B4;
+    --bg: #14100C;
+    --panel: #211A13;
+    --chili: #D6432A;
+    --chili-dark: #B23520;
+    --turmeric: #E2A227;
+    --sage: #6E7F5C;
+    --sage-soft: #DEE4D2;
+    --white: #FFFDF9;
+    --line: rgba(27, 23, 18, .14);
+
+    /* Semantic adjustments: retain the reference palette for decorative use. */
+    --field-border: var(--ink-soft);
+    --chili-action: #CF4028;
+
+    --font-body: "Inter", ui-sans-serif, system-ui, sans-serif;
+    --font-heading: "Fraunces", Georgia, serif;
+    --font-meta: "IBM Plex Mono", ui-monospace, monospace;
+
+    --radius-button: 999px;
+    --radius-input: 10px;
+    --radius-card: 16px;
+    --radius-modal: 18px;
+    --shadow-card: 0 4px 16px rgba(27, 23, 18, .06);
+    --shadow-modal: 0 20px 60px rgba(27, 23, 18, .24);
+  }
+}
+
+/* Reference utilities: bg-parchment, text-ink-soft, border-line, etc. */
+@theme inline {
+  --font-sans: var(--font-body);
+  --font-serif: var(--font-heading);
+  --font-mono: var(--font-meta);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-parchment: var(--parchment);
+  --color-parchment-2: var(--parchment-2);
+  --color-backdrop: var(--bg);
+  --color-panel: var(--panel);
+  --color-chili: var(--chili);
+  --color-chili-dark: var(--chili-dark);
+  --color-turmeric: var(--turmeric);
+  --color-sage: var(--sage);
+  --color-sage-soft: var(--sage-soft);
+  --color-white: var(--white);
+  --color-line: var(--line);
+  --color-field-border: var(--field-border);
+  --color-chili-action: var(--chili-action);
+}

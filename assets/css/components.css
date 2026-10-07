@@ -1,0 +1,216 @@
+@layer base {
+  body {
+    min-height: 100vh;
+    background: var(--parchment);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+    font-weight: 600;
+    line-height: 1.2;
+  }
+
+  h1 { font-size: 38px; }
+  h2 { font-size: 25px; }
+  h3 { font-size: 16px; }
+
+  input[type="checkbox"], input[type="radio"] {
+    accent-color: var(--chili);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--chili);
+    outline-offset: 3px;
+  }
+}
+
+/* Extend daisyUI utilities so its defaults cannot override the ENC specs.
+   Single-purpose Tailwind utilities can still customize individual instances. */
+@utility navbar {
+  background: var(--parchment);
+  border-bottom: 1px solid var(--line);
+}
+
+@utility btn {
+  height: auto;
+  min-height: 0;
+  padding: 12px 20px;
+  border-radius: var(--radius-button);
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.25;
+  text-shadow: none;
+  box-shadow: none;
+}
+
+@utility btn-sm { padding: 9px 15px; }
+
+@utility btn-square {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+}
+
+@utility btn-circle {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+}
+
+@utility btn-primary {
+  &:not(.btn-outline, .btn-dash, .btn-soft):not(:disabled, [disabled], [aria-disabled="true"]):hover {
+    background: var(--chili-dark);
+    border-color: var(--chili-dark);
+  }
+}
+
+@utility btn-ghost {
+  background: transparent;
+  color: var(--ink);
+  border: 1.5px solid var(--line);
+
+  &:not(:disabled, [disabled], [aria-disabled="true"]):hover {
+    background: var(--parchment-2);
+  }
+}
+
+@utility btn-link {
+  background: transparent;
+  border-color: transparent;
+  color: var(--ink-soft);
+}
+
+/* Internal shared field styles; apply through input/select/textarea. */
+@utility enc-field {
+  background: var(--white);
+  color: var(--ink);
+  border: 1.5px solid var(--input-color);
+  border-radius: var(--radius-input);
+  padding: 11px 14px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.5;
+  box-shadow: none;
+  --input-color: var(--field-border);
+
+  &:focus, &:focus-within {
+    border-color: var(--chili);
+    outline: 2px solid var(--chili);
+    outline-offset: 2px;
+    box-shadow: none;
+  }
+
+  /* Keep invalid borders distinct from normal and focused field styles. */
+  &:is(.input-error, .select-error, .textarea-error) {
+    --input-color: var(--color-error);
+    border-color: var(--color-error);
+
+    &:focus, &:focus-within {
+      outline-color: var(--color-error);
+    }
+  }
+
+  &::placeholder { color: var(--ink-soft); }
+}
+
+@utility input {
+  @apply enc-field;
+  height: auto;
+  min-height: 46px;
+}
+
+@utility select {
+  @apply enc-field;
+  height: auto;
+  min-height: 46px;
+  padding-right: 36px;
+}
+
+@utility textarea {
+  @apply enc-field;
+}
+
+@utility label {
+  color: var(--ink);
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+@utility fieldset-legend {
+  color: var(--ink);
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+@utility field-hint {
+  color: var(--ink-soft);
+  font-size: 11.5px;
+}
+
+@utility card {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+}
+
+@utility card-title {
+  font-family: var(--font-heading);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+@utility modal-box {
+  background: var(--parchment);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-modal);
+  box-shadow: var(--shadow-modal);
+}
+
+@utility badge {
+  font-family: var(--font-meta);
+  font-size: 11px;
+}
+
+@utility recipe-meta {
+  font-family: var(--font-meta);
+  font-size: 11px;
+}
+
+@utility tag-chip {
+  background: var(--sage-soft);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-button);
+  padding: 4px 10px;
+  font-family: var(--font-meta);
+  font-size: 11px;
+}
+
+@utility nutrition-box {
+  background: var(--white);
+  color: var(--ink);
+  border: 1.5px solid var(--ink);
+  font-family: var(--font-meta);
+  font-size: 12px;
+
+  & h3 { font-weight: 900; }
+}
+
+@utility dish-art {
+  display: grid;
+  place-items: center;
+  height: 130px;
+  background: linear-gradient(135deg, var(--panel), var(--bg));
+  color: var(--turmeric);
+
+  & > :is(svg, span) {
+    width: 48px;
+    height: 48px;
+  }
+}
