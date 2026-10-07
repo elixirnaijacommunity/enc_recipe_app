@@ -5,7 +5,7 @@ defmodule RecipeAppWebHologram.Layouts.Root do
   def template do
     ~HOLO"""
     <!DOCTYPE html>
-    <html lang="en" data-theme="light">
+    <html lang="en" data-theme="enc">
       <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />

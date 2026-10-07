@@ -1,101 +1,137 @@
 defmodule RecipeAppWebHologram.Pages.Components do
   use Hologram.Page
-  alias RecipeAppWebHologram.HologramCoreComponents.{Button, Card, Input, NavBar}
+  alias RecipeAppWebHologram.HologramCoreComponents.{Button, Card, Icon, Input, NavBar}
 
   route "/components"
   layout RecipeAppWebHologram.Layouts.Root
 
   def init(_params, component, _server) do
-    put_state(component, :data, [])
+    put_state(component, :palette, [
+      {"Ink", "--ink", "bg-ink"},
+      {"Ink soft", "--ink-soft", "bg-ink-soft"},
+      {"Parchment", "--parchment", "bg-parchment"},
+      {"Parchment 2", "--parchment-2", "bg-parchment-2"},
+      {"Backdrop", "--bg", "bg-backdrop"},
+      {"Panel", "--panel", "bg-panel"},
+      {"Chili", "--chili", "bg-chili"},
+      {"Chili dark", "--chili-dark", "bg-chili-dark"},
+      {"Turmeric", "--turmeric", "bg-turmeric"},
+      {"Sage", "--sage", "bg-sage"},
+      {"Sage soft", "--sage-soft", "bg-sage-soft"},
+      {"White", "--white", "bg-white"},
+      {"Line", "--line", "bg-line"}
+    ])
   end
 
   def template do
     ~HOLO"""
-    <div class="container mx-auto">
-    <article class="my-4">
-    <h1>Welcome to components Page</h1>
-    <p>you can view various components styles here</p>
-    </article>
+    <div class="mx-auto max-w-6xl px-6 py-8 space-y-10">
+      <header class="space-y-3">
+        <p class="font-mono text-xs text-ink-soft uppercase tracking-widest">ENC Recipes</p>
+        <h1>Our shared ingredients</h1>
+        <p class="text-ink-soft">The colors, type, and components that bring our recipes together.</p>
+      </header>
 
-    <!-- Navbar  -->
-    <NavBar class="bg-base-100 shadow-sm">
-    <div class="navbar-start">
-    <div class="flex-none">
-    <button class="btn btn-square btn-ghost" aria-label="Open menu">
-    <svg data-slot="icon" fill="none" stroke-width="1.5" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8.25v-1.5m0 1.5c-1.355 0-2.697.056-4.024.166C6.845 8.51 6 9.473 6 10.608v2.513m6-4.871c1.355 0 2.697.056 4.024.166C17.155 8.51 18 9.473 18 10.608v2.513M15 8.25v-1.5m-6 1.5v-1.5m12 9.75-1.5.75a3.354 3.354 0 0 1-3 0 3.354 3.354 0 0 0-3 0 3.354 3.354 0 0 1-3 0 3.354 3.354 0 0 0-3 0 3.354 3.354 0 0 1-3 0L3 16.5m15-3.379a48.474 48.474 0 0 0-6-.371c-2.032 0-4.034.126-6 .371m12 0c.39.049.777.102 1.163.16 1.07.16 1.837 1.094 1.837 2.175v5.169c0 .621-.504 1.125-1.125 1.125H4.125A1.125 1.125 0 0 1 3 20.625v-5.17c0-1.08.768-2.014 1.837-2.174A47.78 47.78 0 0 1 6 13.12M12.265 3.11a.375.375 0 1 1-.53 0L12 2.845l.265.265Zm-3 0a.375.375 0 1 1-.53 0L9 2.845l.265.265Zm6 0a.375.375 0 1 1-.53 0L15 2.845l.265.265Z"></path>
-    </svg>
-    </button>
-    </div>
-    <div class="flex-1">
-    <a class="btn btn-ghost text-xl">Enc Recipes</a>
-    </div>
-    </div>
-    <div class="navbar-center">
-    <ul tabindex="-1" class="menu menu-horizontal px-2">
-    <li><a>Home</a></li>
-    <li><a>Receipts</a></li>
-    <li><a>Share</a></li>
-    <li><a>Discover</a></li>
-    </ul>
-    </div>
-    <div class="navbar-end">
-    <Button class="btn-ghost" type="button">Login</Button>
-    <Button class="btn-primary" type="button">Create Account</Button>
-    </div>
-    </NavBar>
+      <section aria-labelledby="palette-title" class="space-y-4">
+        <h2 id="palette-title">Color palette</h2>
+        <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
+          {%for {label, token, color_class} <- @palette}
+            <div class="card overflow-hidden">
+              <div class="h-16 {color_class}"></div>
+              <div class="p-3 space-y-1">
+                <p class="font-semibold">{label}</p>
+                <p class="font-mono text-[10.5px] text-ink-soft break-words">{token}</p>
+              </div>
+            </div>
+          {/for}
+        </div>
+      </section>
 
-    <!-- Buttons -->
-    <h3 class="my-4">Buttons</h3>
-    <div class="my-4">
-    <Button class="btn-primary" type="button">Button</Button>
-    </div>
+      <section aria-labelledby="navigation-title" class="space-y-4">
+        <h2 id="navigation-title">Navigation</h2>
+        <NavBar class="gap-4 flex-wrap">
+          <span class="font-serif text-xl font-semibold flex-1">ENC Recipes</span>
+          <span class="text-chili font-semibold">Discover</span>
+          <Button class="btn-ghost">Log in</Button>
+          <Button class="btn-primary">Create account</Button>
+        </NavBar>
+      </section>
 
-    <!-- Input -->
-    <h3 class="my-4">Input</h3>
-    <div class="my-4">
-    <div class="my-4">
-    <Input type="text" class="input-primary" rest={%{placeholder: "Type here"}}/>
-    </div>
-    <div class="my-4">
-    <Input type="datetime-local" class="input-primary" rest={%{placeholder: "Type here"}}/>
-    </div>
-    </div>
+      <section aria-labelledby="buttons-title" class="space-y-4">
+        <h2 id="buttons-title">Buttons</h2>
+        <div class="flex flex-wrap items-center gap-3">
+          <Button class="btn-primary">Share a recipe</Button>
+          <Button class="btn-ghost">Save for later</Button>
+          <Button class="btn-link">View recipe</Button>
+          <Button class="btn-primary btn-sm">Follow</Button>
+          <Button class="btn-primary" rest={%{disabled: true}}>Unavailable</Button>
+        </div>
+      </section>
 
-    <!-- Typography -->
-    <h3 class="my-4">Typography</h3>
-    <div class="my-4">
-    <!-- Font Family -->
-    <p class="font-sans">Tailwind is awesome</p>
-    <p class="font-serif">Tailwind is awesome</p>
-    <p class="font-mono">Tailwind is awesome</p>
+      <section aria-labelledby="fields-title" class="space-y-4">
+        <h2 id="fields-title">Form fields</h2>
+        <div class="grid md:grid-cols-2 gap-6">
+          <div class="space-y-2">
+            <label for="recipe-name" class="label">Recipe name</label>
+            <Input class="w-full" rest={%{id: "recipe-name", placeholder: "Grandma’s jollof rice", "aria-describedby": "recipe-hint"}} />
+            <p id="recipe-hint" class="field-hint">Give your dish a name that tells its story.</p>
+          </div>
+          <div class="space-y-2">
+            <label for="recipe-notes" class="label">Cooking notes</label>
+            <textarea id="recipe-notes" class="textarea w-full" placeholder="What makes this recipe special?"></textarea>
+          </div>
+        </div>
+        <div class="flex flex-wrap gap-6">
+          <label class="flex items-center gap-2"><input type="checkbox" /> Vegetarian</label>
+          <label class="flex items-center gap-2"><input type="radio" name="difficulty" checked /> Easy</label>
+          <label class="flex items-center gap-2"><input type="radio" name="difficulty" /> Medium</label>
+        </div>
+      </section>
 
-    <!-- Font Size -->
-    <p class="text-xs">Tailwind is awesome</p>
-    <p class="text-sm">Tailwind is awesome</p>
-    <p class="text-base">Tailwind is awesome</p>
-    <p class="text-lg">Tailwind is awesome</p>
-    <p class="text-xl">Tailwind is awesome</p>
-    <p class="text-2xl">Tailwind is awesome</p>
+      <section aria-labelledby="typography-title" class="space-y-4">
+        <h2 id="typography-title">Typography</h2>
+        <div class="grid md:grid-cols-3 gap-6">
+          <div class="space-y-2">
+            <p class="font-serif text-2xl font-semibold">A taste of home</p>
+            <p class="text-ink-soft">Fraunces for headlines and recipe titles.</p>
+          </div>
+          <div class="space-y-2">
+            <p class="font-sans">Good food starts with a story worth sharing.</p>
+            <p class="text-ink-soft">Inter for body text, navigation, and fields.</p>
+          </div>
+          <div class="space-y-2">
+            <p class="recipe-meta">35 MIN · 4 SERVINGS · EASY</p>
+            <p class="text-ink-soft">IBM Plex Mono for tags and recipe details.</p>
+          </div>
+        </div>
+      </section>
 
-    <!-- Font Weight -->
-    <p class="font-light">Tailwind is awesome</p>
-    <p class="font-normal">Tailwind is awesome</p>
-    <p class="font-medium">Tailwind is awesome</p>
-    <p class="font-semibold">Tailwind is awesome</p>
-    <p class="font-bold">Tailwind is awesome</p>
-    </div>
-
-    <!-- Card -->
-    <h3 class="my-4">Card</h3>
-    <div class="my-4">
-    <Card class="card-dash" title="test" class_figure="hero-beaker">
-    <p>A card component has a figure, a body part, and inside body there are title and actions parts</p>
-    <div class="card-actions justify-end">
-    </div>
-    </Card>
-    </div>
-
+      <section aria-labelledby="cards-title" class="space-y-4">
+        <h2 id="cards-title">Cards and tags</h2>
+        <div class="grid md:grid-cols-2 gap-6">
+          <Card class="overflow-hidden" title="Smoky party jollof">
+            <div class="dish-art rounded-t-box -order-1">
+              <Icon name="hero-fire" class="size-12" />
+            </div>
+            <p class="text-ink-soft">Slow-cooked rice, warm spices, and a little taste of celebration.</p>
+            <p class="recipe-meta text-ink-soft">45 MIN · 6 SERVINGS</p>
+            <div class="flex flex-wrap gap-2">
+              <span class="tag-chip">West African</span>
+              <span class="tag-chip">Vegetarian</span>
+            </div>
+            <div class="card-actions mt-2"><Button class="btn-primary btn-sm">View recipe</Button></div>
+          </Card>
+          <Card title="A place for every food story">
+            <p class="text-ink-soft">Discover recipes, share your favorites, and find your community.</p>
+            <div><span class="tag-chip">Coming soon</span></div>
+            <div class="nutrition-box p-4 mt-4 space-y-2">
+              <h3>Nutrition Facts</h3>
+              <p>Per serving</p>
+              <p class="border-t border-ink pt-2">Calories 320</p>
+            </div>
+          </Card>
+        </div>
+      </section>
     </div>
     """
   end

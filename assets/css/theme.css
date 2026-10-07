@@ -1,0 +1,39 @@
+/* One application theme, independent of OS color preference. */
+@plugin "../vendor/daisyui-theme" {
+  name: "enc";
+  default: true;
+  prefersdark: false;
+  color-scheme: "light";
+
+  --color-base-100: var(--white);
+  --color-base-200: var(--parchment);
+  --color-base-300: var(--parchment-2);
+  --color-base-content: var(--ink);
+  --color-primary: var(--chili);
+  --color-primary-content: var(--white);
+  --color-secondary: var(--turmeric);
+  --color-secondary-content: var(--ink);
+  --color-accent: var(--sage);
+  --color-accent-content: var(--white);
+  --color-neutral: var(--ink);
+  --color-neutral-content: var(--white);
+
+  /* Status components reuse the reference palette, with explanatory icon/text. */
+  --color-info: var(--sage-soft);
+  --color-info-content: var(--ink);
+  --color-success: var(--sage-soft);
+  --color-success-content: var(--ink);
+  --color-warning: var(--turmeric);
+  --color-warning-content: var(--ink);
+  --color-error: var(--chili);
+  --color-error-content: var(--white);
+
+  --radius-selector: 0.25rem;
+  --radius-field: var(--radius-input);
+  --radius-box: var(--radius-card);
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1.5px;
+  --depth: 0;
+  --noise: 0;
+}
