@@ -5,7 +5,7 @@
 @source "../css";
 @source "../js";
 @source "../../lib/recipe_app_web";
-
+@source "../../app";
 /* A Tailwind plugin that makes "hero-#{ICON}" classes available.
    The heroicons installation itself is managed by your mix.exs */
 @plugin "../vendor/heroicons";
