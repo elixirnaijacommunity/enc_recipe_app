@@ -1,11 +1,11 @@
-defmodule RecipeAppWebHologram.CoreComponents do
+defmodule RecipeAppWebHologram.HologramCoreComponents do
   @moduledoc """
   Core UI components for Hologram (daisyUI + Tailwind).
   Hologram needs one module per component, so they are nested here.
 
   Usage in a page or component:
 
-      alias RecipeAppWebHologram.CoreComponents.{
+      alias RecipeAppWebHologram.HologramCoreComponents.{
         Button, Card, Flash, Header, Icon, Input, List, NavBar, Table
       }
   """

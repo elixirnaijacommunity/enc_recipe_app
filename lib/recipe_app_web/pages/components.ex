@@ -1,6 +1,6 @@
 defmodule RecipeAppWebHologram.Pages.Components do
   use Hologram.Page
-  alias RecipeAppWebHologram.CoreComponents.{Button, Card, Input, NavBar}
+  alias RecipeAppWebHologram.HologramCoreComponents.{Button, Card, Input, NavBar}
 
   route "/components"
   layout RecipeAppWebHologram.Layouts.Root
