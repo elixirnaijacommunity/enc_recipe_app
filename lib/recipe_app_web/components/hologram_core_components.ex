@@ -124,16 +124,16 @@ defmodule RecipeAppWebHologram.HologramCoreComponents do
   defmodule Header do
     use Hologram.Component
 
+    prop :title, :string, default: ""
     prop :subtitle, :string, default: ""
     prop :class, :string, default: ""
 
     def template do
       ~HOLO"""
-      <header class="pb-4 {@class}">
-        <h1 class="text-lg font-semibold leading-8"><slot /></h1>
-        {%if @subtitle != ""}
-          <p class="text-sm text-ink-soft">{@subtitle}</p>
-        {/if}
+      <header class="space-y-3">
+      <p class="font-mono text-xs text-ink-soft uppercase tracking-widest">{@title}</p>
+      <h1>{@subtitle}</h1>
+      <slot />
       </header>
       """
     end
