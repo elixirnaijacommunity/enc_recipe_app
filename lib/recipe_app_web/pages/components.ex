@@ -1,6 +1,16 @@
 defmodule RecipeAppWebHologram.Pages.Components do
   use Hologram.Page
-  alias RecipeAppWebHologram.HologramCoreComponents.{Button, Card, Icon, Input, NavBar}
+
+  alias RecipeAppWebHologram.HologramCoreComponents.{
+    Button,
+    Card,
+    Icon,
+    Input,
+    NavBar,
+    Header,
+    List,
+    Table
+  }
 
   route "/components"
   layout RecipeAppWebHologram.Layouts.Root
@@ -26,11 +36,9 @@ defmodule RecipeAppWebHologram.Pages.Components do
   def template do
     ~HOLO"""
     <div class="mx-auto max-w-6xl px-6 py-8 space-y-10">
-      <header class="space-y-3">
-        <p class="font-mono text-xs text-ink-soft uppercase tracking-widest">ENC Recipes</p>
-        <h1>Our shared ingredients</h1>
-        <p class="text-ink-soft">The colors, type, and components that bring our recipes together.</p>
-      </header>
+      <Header title="ENC Recipes" subtitle="Our shared ingredients">
+        <p class="text-ink-soft">The colors, type, and components that bring our recipes together.</p>      
+      </Header>
 
       <section aria-labelledby="palette-title" class="space-y-4">
         <h2 id="palette-title">Color palette</h2>
@@ -133,6 +141,20 @@ defmodule RecipeAppWebHologram.Pages.Components do
               <p class="border-t border-ink pt-2">Calories 320</p>
             </div>
           </Card>
+        </div>
+      </section>
+      
+      <section aria-labelledby="buttons-title" class="space-y-4">
+        <h2 id="buttons-title">List</h2>
+        <div class="flex flex-wrap items-center gap-3">      
+         <List items={[{1,"id 1"},{2,"id 2"}]} />
+        </div>
+      </section>
+
+      <section aria-labelledby="buttons-title" class="space-y-4">
+        <h2 id="buttons-title">Table</h2>
+        <div class="flex flex-wrap items-center gap-3">      
+         <Table headers={["id","name"]} rows={[[1,"1"],[2,"2"],[3,"3"]]} />
         </div>
       </section>
     </div>
