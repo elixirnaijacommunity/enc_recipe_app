@@ -4,9 +4,8 @@ The app currently has one theme: `enc`. Both Phoenix and Hologram root layouts
 select `data-theme="enc"`, and the CSS also provides it as the default. OS dark
 mode and previously saved Phoenix theme preferences do not change this palette.
 
-The source is `enc_recipes_current_design_system.pdf`. This change implements the
-shared styling foundation; the document's complete page layouts and hero dish
-illustrations are separate page work. Existing responsive layouts remain intact.
+The shared styling source is `enc_recipes_current_design_system.pdf`. The homepage
+also uses the layout and artwork from `enc_recipes_website_food.html`.
 
 ## CSS structure
 
@@ -15,7 +14,7 @@ illustrations are separate page work. Existing responsive layouts remain intact.
   font stacks, radii, and shadows.
 - `assets/css/theme.css`: maps those tokens into daisyUI's semantic roles.
 - `assets/css/components.css`: common typography, buttons, fields, cards, chips,
-  modal surfaces, nutrition labels, and dish placeholders.
+  modal surfaces, nutrition labels, dish placeholders, and responsive homepage layout.
 - `assets/css/fonts.css`: locally hosted Fraunces, Inter, and IBM Plex Mono. Latin
   and extended Latin subsets and their open font licenses live in `priv/static/fonts`.
 
@@ -56,6 +55,10 @@ possible combination of palette utilities.
 
 ## Shared components
 
+Reusable Hologram UI components live in `HologramCoreComponents`, including
+`Brand` and `RecipeCard`. Pages compose these components and provide their data;
+the root layout owns the document shell, and `components.css` owns their styles.
+
 Buttons are pills with 12px/20px padding; `btn-sm` uses 9px/15px. `btn-ghost`
 provides the reference's bordered secondary action and `btn-link` the text action.
 Primary solid buttons hover to chili dark. Explicit utility classes may override
@@ -78,5 +81,22 @@ Headings use Fraunces, body text uses Inter, and `font-mono`, `recipe-meta`, and
 
 Run `mix assets.build`, start the app with `mix holo`, and visit `/components`
 for the palette and examples of shared styles. Check the same page with the OS set
-to light and dark; its appearance should remain the same. The Phoenix `/` starter
-page also uses the fixed palette and no longer includes a theme switcher.
+to light and dark; its appearance should remain the same.
+
+The Hologram homepage at `/` follows `enc_recipes_website_food.html`. It reuses
+the shared Button, Card, Icon, and NavBar components. The supplied photograph and
+recipe illustrations are served locally from `priv/static/images/home`; no external
+image or font service is required. The browser mockup and presenter rail are not
+part of the application.
+
+The homepage uses four feature columns and three recipe columns on desktop,
+two columns on tablets, and single columns on small phones. The header contains
+the brand, Log in, and Create account; the account buttons wrap below the brand
+on small phones. The footer contains the brand, support, and legal sections.
+Check widths of 320, 390, 768, and 1440px, keyboard navigation, and the skip link.
+
+Recipe cards currently show the reference's sample content, rather than a live
+community feed. Browse recipes points to the homepage recipe section. Account,
+help, and legal controls are inactive placeholders from the reference design;
+this task implements only the homepage. Run `mix holo` to enable
+Hologram's router and client runtime in development.

@@ -6,7 +6,7 @@ defmodule RecipeAppWebHologram.HologramCoreComponents do
   Usage in a page or component:
 
       alias RecipeAppWebHologram.HologramCoreComponents.{
-        Button, Card, Flash, Header, Icon, Input, List, NavBar, Table
+        Brand, Button, Card, Flash, Header, Icon, Input, List, NavBar, RecipeCard, Table
       }
   """
 
@@ -188,6 +188,42 @@ defmodule RecipeAppWebHologram.HologramCoreComponents do
           </li>
         {/for}
       </ul>
+      """
+    end
+  end
+
+  defmodule Brand do
+    use Hologram.Component
+
+    def template do
+      ~HOLO"""
+      <a href="/" class="home-brand" aria-label="ENC Recipes home">
+        <img src="/images/home/chef-hat.svg" width="28" height="28" alt="" />
+        <span>ENC <span class="home-brand-accent">Recipes</span></span>
+      </a>
+      """
+    end
+  end
+
+  defmodule RecipeCard do
+    use Hologram.Component
+
+    alias RecipeAppWebHologram.HologramCoreComponents.{Card, Icon}
+
+    prop :recipe, :map
+
+    def template do
+      ~HOLO"""
+      <Card class="home-recipe-card" rest={%{"aria-label": @recipe.name}}>
+        <div class="home-recipe-art home-recipe-art-{@recipe.slug}">
+          <img src="/images/home/{@recipe.slug}.svg" width="200" height="160" loading="lazy" alt={@recipe.name} />
+        </div>
+        <div class="home-recipe-copy">
+          <h3>{@recipe.name}</h3>
+          <p class="home-recipe-meta"><Icon name="hero-clock" /> <span>{@recipe.time} · {@recipe.cook}</span></p>
+        </div>
+        <div class="home-punch-strip" aria-hidden="true"><span></span><span></span><span></span></div>
+      </Card>
       """
     end
   end
