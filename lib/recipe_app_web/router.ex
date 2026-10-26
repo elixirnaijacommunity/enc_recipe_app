@@ -15,11 +15,7 @@ defmodule RecipeAppWeb.Router do
     plug :fetch_session
   end
 
-  scope "/", RecipeAppWeb do
-    pipe_through :browser
-
-    get "/", PageController, :home
-  end
+  # Hologram.Router serves frontend pages, including "/", before this router.
 
   scope "/api/v1", RecipeAppWeb do
     pipe_through :api
