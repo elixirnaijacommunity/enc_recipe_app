@@ -66,6 +66,31 @@ defmodule RecipeApp.Accounts.Email do
     )
   end
 
+  def password_reset_email(user, token) do
+    reset_url =
+      RecipeAppWeb.Endpoint.url() <> "/reset-password?" <> URI.encode_query(%{token: token})
+
+    general_email(
+      user,
+      "Reset your ENC Recipes password",
+      """
+      <p>We received a request to reset your password.</p>
+      <p><a href="#{reset_url}" style="display:inline-block;padding:12px 20px;background:#d94127;color:#fff;text-decoration:none;border-radius:999px">Reset my password</a></p>
+      <p>This link expires in one hour and can only be used once.</p>
+      <p>If you didn't request a password reset, you can safely ignore this email.</p>
+      """,
+      """
+      We received a request to reset your password.
+
+      Reset your password by visiting:
+      #{reset_url}
+
+      This link expires in one hour and can only be used once.
+      If you didn't request a password reset, you can safely ignore this email.
+      """
+    )
+  end
+
   defp layout_html(user, content) do
     """
     <html>

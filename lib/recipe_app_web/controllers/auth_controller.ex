@@ -44,6 +44,7 @@ defmodule RecipeAppWeb.AuthController do
         conn
         |> configure_session(renew: true)
         |> put_session(:user_id, user.id)
+        |> put_session(:auth_version, user.auth_version)
         |> json(%{
           message: "Login successful",
           user: %{
@@ -88,6 +89,41 @@ defmodule RecipeAppWeb.AuthController do
   @doc """
   Handles user logout by clearing the session.
   """
+
+  def forgot_password(conn, %{"email" => email}) do
+    :ok = Accounts.request_password_reset(email)
+
+    json(conn, %{
+      message: "If an account exists for that email, a password reset link has been sent."
+    })
+  end
+
+  def forgot_password(conn, _params) do
+    conn |> put_status(:bad_request) |> json(%{error: "Email is required"})
+  end
+
+  def reset_password(conn, %{"token" => token, "password" => password}) do
+    case Accounts.reset_password(token, password) do
+      {:ok, _user} ->
+        conn
+        |> delete_session(:user_id)
+        |> delete_session(:auth_version)
+        |> json(%{message: "Password updated successfully. You can now log in."})
+
+      {:error, %Ecto.Changeset{} = changeset} ->
+        {:error, changeset}
+
+      {:error, :invalid_token} ->
+        conn
+        |> put_status(:unprocessable_entity)
+        |> json(%{error: "Invalid or expired reset link"})
+    end
+  end
+
+  def reset_password(conn, _params) do
+    conn |> put_status(:bad_request) |> json(%{error: "Token and password are required"})
+  end
+
   def verify_email(conn, %{"token" => token}) do
     case Accounts.verify_email(token) do
       {:ok, _user} ->
