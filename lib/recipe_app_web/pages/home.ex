@@ -1,9 +1,12 @@
 defmodule RecipeAppWebHologram.Pages.Home do
   use Hologram.Page
 
+  alias Hologram.UI.Link
+  alias RecipeApp.Accounts
+  alias RecipeAppWebHologram.Pages.{Login, Register}
+
   alias RecipeAppWebHologram.HologramCoreComponents.{
     Brand,
-    Button,
     Card,
     Icon,
     NavBar,
@@ -11,15 +14,30 @@ defmodule RecipeAppWebHologram.Pages.Home do
   }
 
   route "/"
+  middleware RecipeAppWebHologram.Middleware.ValidateSession
 
   layout RecipeAppWebHologram.Layouts.Root,
     title: "ENC Recipes — A home for your recipes",
     description:
       "A place built for cooking. Share full recipes, discover food cultures, and find your community with ENC Recipes."
 
-  def init(_params, component, _server) do
+  def init(_params, component, server) do
+    current_user =
+      case server.user_id do
+        nil ->
+          nil
+
+        user_id ->
+          case Accounts.get_user_by_id(user_id) do
+            nil -> nil
+            user -> %{username: user.username}
+          end
+      end
+
     put_state(component,
       year: Date.utc_today().year,
+      current_user: current_user,
+      logging_out: false,
       recipes: [
         %{
           name: "Jollof Rice",
@@ -46,6 +64,27 @@ defmodule RecipeAppWebHologram.Pages.Home do
     )
   end
 
+  def command(:logout, _params, server) do
+    server
+    |> delete_user_id()
+    |> put_action(:logout_succeeded)
+  end
+
+  def action(:submit_logout, _params, component) do
+    if component.state.logging_out do
+      component
+    else
+      put_state(component, :logging_out, true)
+      |> put_command(:logout)
+    end
+  end
+
+  def action(:logout_succeeded, _params, component) do
+    component
+    |> put_state(:current_user, nil)
+    |> put_state(:logging_out, false)
+  end
+
   def template do
     ~HOLO"""
     <div class="enc-home" id="top">
@@ -54,12 +93,23 @@ defmodule RecipeAppWebHologram.Pages.Home do
         <NavBar class="home-header">
           <Brand />
           <div class="home-account-actions">
-            <Button class="btn-ghost" rest={%{"aria-disabled": true}}>Log in</Button>
-            <Button class="btn-primary" rest={%{"aria-disabled": true}}>Create account</Button>
+            {%if @current_user != nil}
+              <span class="home-account-username">Hi, {@current_user.username}</span>
+              <button type="button" class="btn btn-ghost" disabled={@logging_out} $click="submit_logout">
+                {%if @logging_out}
+                  <span class="loading loading-spinner loading-sm" aria-hidden="true"></span>
+                  <span>Logging out...</span>
+                {%else}
+                  Log out
+                {/if}
+              </button>
+            {%else}
+              <Link to={login_page()}>Log in</Link>
+              <Link to={register_page()} class="btn btn-primary">Create account</Link>
+            {/if}
           </div>
         </NavBar>
       </header>
-
       <main id="main-content" tabindex="-1">
         <section class="home-hero" aria-labelledby="hero-title">
           <div class="home-photo-wrap home-container">
@@ -72,7 +122,9 @@ defmodule RecipeAppWebHologram.Pages.Home do
               <h1 id="hero-title">Recipes get lost in Reels.<br /><span>Not here.</span></h1>
               <p>ENC Recipes is a place built for cooking, not just scrolling — post the full recipe, filter by cook or country, and find dishes people actually made.</p>
               <div class="home-hero-actions">
-                <Button class="btn-primary" rest={%{"aria-disabled": true}}>Create free account</Button>
+                {%if @current_user == nil}
+                  <Link to={register_page()} class="btn btn-primary">Create free account</Link>
+                {/if}
                 <a href="#recipes" class="btn btn-ghost">Browse recipes</a>
               </div>
               <p class="home-trust">NO CREDIT CARD · FIRST PHASE: RECIPES + DISCOVERY</p>
@@ -129,10 +181,12 @@ defmodule RecipeAppWebHologram.Pages.Home do
           </div>
         </section>
 
-        <section id="join" class="home-join" aria-labelledby="join-title">
-          <h2 id="join-title">Start posting your recipes</h2>
-          <Button class="btn-primary" rest={%{"aria-disabled": true}}>Create free account</Button>
-        </section>
+        {%if @current_user == nil}
+          <section id="join" class="home-join" aria-labelledby="join-title">
+            <h2 id="join-title">Start posting your recipes</h2>
+            <Link to={register_page()} class="btn btn-primary">Create free account</Link>
+          </section>
+        {/if}
       </main>
 
       <footer class="home-footer">
@@ -149,5 +203,17 @@ defmodule RecipeAppWebHologram.Pages.Home do
 
     </div>
     """
+  end
+
+  defp login_page do
+    _ = Login.__params__()
+    _ = Login.__route__()
+    Login
+  end
+
+  defp register_page do
+    _ = Register.__params__()
+    _ = Register.__route__()
+    Register
   end
 end
