@@ -6,6 +6,9 @@ defmodule RecipeAppWebHologram.Pages.AuthPageCommandsTest do
   alias Hologram.{Component, Server}
   alias RecipeApp.Accounts
   alias RecipeApp.Repo
+
+  alias RecipeAppWebHologram.Middleware.ValidateSession
+
   alias RecipeAppWebHologram.Pages.{ForgotPassword, Login, Register, ResetPassword}
 
   defp register_user(attrs) do
@@ -180,6 +183,42 @@ defmodule RecipeAppWebHologram.Pages.AuthPageCommandsTest do
     assert server.user_id == user.id
     assert server.session["auth_version"] == user.auth_version
     assert server.next_action
+  end
+
+  test "Hologram middleware leaves anonymous sessions unchanged" do
+    server = %Server{}
+    assert ValidateSession.call(server, []) == server
+  end
+
+  test "Hologram middleware clears sessions with stale authentication versions" do
+    user =
+      %{"username" => "stale-session", "email" => "stale-session@example.com"}
+      |> register_user()
+      |> activate_user()
+
+    server = %Server{
+      user_id: user.id,
+      session: %{"auth_version" => user.auth_version - 1}
+    }
+
+    validated = ValidateSession.call(server, [])
+
+    assert validated.user_id == nil
+    refute Map.has_key?(validated.session, "auth_version")
+  end
+
+  test "Hologram middleware preserves sessions with the current authentication version" do
+    user =
+      %{"username" => "valid-session", "email" => "valid-session@example.com"}
+      |> register_user()
+      |> activate_user()
+
+    server = %Server{
+      user_id: user.id,
+      session: %{"auth_version" => user.auth_version}
+    }
+
+    assert ValidateSession.call(server, []) == server
   end
 
   test "login command handles unverified and invalid credentials" do
