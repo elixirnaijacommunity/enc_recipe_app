@@ -66,6 +66,24 @@ defmodule RecipeAppWeb.AuthControllerTest do
 
     assert %{"message" => "Login successful"} = json_response(login_conn, 200)
     assert get_session(login_conn, :user_id) == user.id
+    assert get_session(login_conn, :auth_version) == Repo.get!(User, user.id).auth_version
+  end
+
+  test "forgot password returns a non-enumerating response", %{conn: conn} do
+    conn = post(conn, ~p"/api/v1/auth/forgot-password", %{"email" => "missing@example.com"})
+
+    assert json_response(conn, 200) == %{
+             "message" =>
+               "If an account exists for that email, a password reset link has been sent."
+           }
+  end
+
+  test "reset password requires a token and password", %{conn: conn} do
+    conn = post(conn, ~p"/api/v1/auth/reset-password", %{})
+
+    assert json_response(conn, 400) == %{
+             "error" => "Token and password are required"
+           }
   end
 
   test "returns 400 when verification token is missing", %{conn: conn} do
@@ -160,5 +178,155 @@ defmodule RecipeAppWeb.AuthControllerTest do
     assert json_response(login_conn, 401) == %{
              "error" => "Invalid email or password"
            }
+  end
+
+  test "forgot password rejects a missing email", %{conn: conn} do
+    conn = post(conn, ~p"/api/v1/auth/forgot-password", %{})
+
+    assert json_response(conn, 400) == %{"error" => "Email is required"}
+  end
+
+  test "reset password rejects an invalid token", %{conn: conn} do
+    conn =
+      post(conn, ~p"/api/v1/auth/reset-password", %{
+        "token" => "invalid-token",
+        "password" => "new-password-123"
+      })
+
+    assert json_response(conn, 422) == %{"error" => "Invalid or expired reset link"}
+  end
+
+  test "reset password updates the password and consumes the token", %{conn: conn} do
+    {:ok, user} =
+      RecipeApp.Accounts.register_user(%{
+        "username" => "reset-user",
+        "email" => "reset-user@example.com",
+        "password" => "password123"
+      })
+
+    user
+    |> Ecto.Changeset.change(status: "active")
+    |> Repo.update!()
+
+    login_conn =
+      post(conn, ~p"/api/v1/auth/login", %{
+        "email" => user.email,
+        "password" => "password123"
+      })
+
+    assert get_session(login_conn, :auth_version) == user.auth_version
+
+    assert :ok = RecipeApp.Accounts.request_password_reset(user.email)
+
+    test_pid = self()
+
+    assert_email_sent(fn email ->
+      send(test_pid, {:reset_email, email})
+      email.subject == "Reset your ENC Recipes password"
+    end)
+
+    assert_receive {:reset_email, email}
+    [_, reset_url] = Regex.run(~r|href="([^"]+/reset-password\?token=[^"]+)"|, email.html_body)
+
+    token =
+      reset_url |> URI.parse() |> Map.fetch!(:query) |> URI.decode_query() |> Map.fetch!("token")
+
+    conn =
+      post(login_conn, ~p"/api/v1/auth/reset-password", %{
+        "token" => token,
+        "password" => "new-password-123"
+      })
+
+    assert json_response(conn, 200) == %{
+             "message" => "Password updated successfully. You can now log in."
+           }
+
+    assert get_session(conn, :user_id) == nil
+    assert get_session(conn, :auth_version) == nil
+
+    assert {:ok, authenticated_user} =
+             RecipeApp.Accounts.authenticate_user(user.email, "new-password-123")
+
+    assert authenticated_user.id == user.id
+  end
+
+  test "login rejects a suspended account", %{conn: conn} do
+    {:ok, user} =
+      RecipeApp.Accounts.register_user(%{
+        "username" => "suspended-user",
+        "email" => "suspended@example.com",
+        "password" => "password123"
+      })
+
+    user
+    |> Ecto.Changeset.change(status: "suspended")
+    |> Repo.update!()
+
+    conn =
+      post(conn, ~p"/api/v1/auth/login", %{
+        "email" => user.email,
+        "password" => "password123"
+      })
+
+    assert json_response(conn, 403) == %{"error" => "Your account is not active."}
+  end
+
+  test "password reset invalidates a different API session on its next request", %{conn: conn} do
+    {:ok, user} =
+      RecipeApp.Accounts.register_user(%{
+        "username" => "other-session",
+        "email" => "other-session@example.com",
+        "password" => "password123"
+      })
+
+    user =
+      user
+      |> Ecto.Changeset.change(status: "active")
+      |> Repo.update!()
+
+    stale_session =
+      post(conn, ~p"/api/v1/auth/login", %{
+        "email" => user.email,
+        "password" => "password123"
+      })
+
+    assert get_session(stale_session, :user_id) == user.id
+
+    assert :ok = RecipeApp.Accounts.request_password_reset(user.email)
+
+    test_pid = self()
+
+    assert_email_sent(fn email ->
+      send(test_pid, {:reset_email, email})
+      email.subject == "Reset your ENC Recipes password"
+    end)
+
+    assert_receive {:reset_email, email}
+
+    [_, reset_url] =
+      Regex.run(~r|href="([^"]+/reset-password\?token=[^"]+)"|, email.html_body)
+
+    token =
+      reset_url
+      |> URI.parse()
+      |> Map.fetch!(:query)
+      |> URI.decode_query()
+      |> Map.fetch!("token")
+
+    reset_conn =
+      post(build_conn(), ~p"/api/v1/auth/reset-password", %{
+        "token" => token,
+        "password" => "new-password-123"
+      })
+
+    assert json_response(reset_conn, 200)
+
+    stale_session =
+      post(stale_session, ~p"/api/v1/auth/forgot-password", %{
+        "email" => "missing@example.com"
+      })
+
+    assert get_session(stale_session, :user_id) == nil
+    assert get_session(stale_session, :auth_version) == nil
   end
 end
