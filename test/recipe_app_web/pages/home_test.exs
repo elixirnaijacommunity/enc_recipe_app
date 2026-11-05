@@ -29,7 +29,7 @@ defmodule RecipeAppWebHologram.Pages.HomeTest do
 
     assert markup =~ "Skip to content"
     refute markup =~ ~s(href="/signup")
-    refute markup =~ ~s(href="/login")
+    assert markup =~ ~s(href="/login")
     refute markup =~ "popovertarget"
     refute markup =~ ~s(role="dialog")
   end
