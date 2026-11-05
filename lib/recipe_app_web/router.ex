@@ -13,6 +13,7 @@ defmodule RecipeAppWeb.Router do
   pipeline :api do
     plug :accepts, ["json"]
     plug :fetch_session
+    plug RecipeAppWeb.Plugs.ValidateSession
   end
 
   # Hologram.Router serves frontend pages, including "/", before this router.
@@ -23,6 +24,8 @@ defmodule RecipeAppWeb.Router do
     post "/auth/signup", AuthController, :signup
     post "/auth/login", AuthController, :login
     get "/auth/verify-email", AuthController, :verify_email
+    post "/auth/forgot-password", AuthController, :forgot_password
+    post "/auth/reset-password", AuthController, :reset_password
   end
 
   # Other scopes may use custom stacks.
