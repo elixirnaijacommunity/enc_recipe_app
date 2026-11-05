@@ -72,7 +72,7 @@ defmodule RecipeAppWebHologram.Pages.Components do
           <Button class="btn-ghost">Save for later</Button>
           <Button class="btn-link">View recipe</Button>
           <Button class="btn-primary btn-sm">Follow</Button>
-          <Button class="btn-primary" rest={%{disabled: true}}>Unavailable</Button>
+          <Button class="btn-primary" disabled={true}>Unavailable</Button>
         </div>
       </section>
 

@@ -29,13 +29,23 @@ defmodule RecipeAppWebHologram.HologramCoreComponents do
     prop :type, :string, default: "button"
     prop :class, :string, default: ""
     prop :rest, :map, default: %{}
+    prop :disabled, :boolean, default: false
+    prop :loading, :boolean, default: false
+    prop :loading_text, :string, default: "Please wait..."
 
     def template do
       ~HOLO"""
       <button type={@type}
         class="btn {@class}"
-        ...{@rest}>
-        <slot />
+        ...{@rest}
+        disabled={@loading || @disabled}
+        aria-busy={@loading}>
+        {%if @loading}
+          <span class="loading loading-spinner loading-sm" aria-hidden="true"></span>
+          <span>{@loading_text}</span>
+        {%else}
+          <slot />
+        {/if}
       </button>
       """
     end
@@ -54,6 +64,42 @@ defmodule RecipeAppWebHologram.HologramCoreComponents do
         type={@type}
         class="input {@class}"
         ...{@rest} />
+      """
+    end
+  end
+
+  defmodule PasswordField do
+    use Hologram.Component
+
+    prop :name, :string
+    prop :label, :string, default: "Password"
+    prop :hint, :string, default: ""
+    prop :id, :string
+
+    def init(_props, component, _server) do
+      put_state(component, :visible, false)
+    end
+
+    def action(:toggle_visibility, _params, component) do
+      put_state(component, :visible, !component.state.visible)
+    end
+
+    def template do
+      ~HOLO"""
+      <div class="auth-field">
+        <label for={@id}>{@label}</label>
+        <div class="auth-password-wrap">
+          <input id={@id} name={@name} type={if(@visible, do: "text", else: "password")}
+            class="auth-input" autocomplete="current-password" required />
+          <button type="button" class="auth-password-toggle" $click="toggle_visibility"
+            aria-label={if(@visible, do: "Hide password", else: "Show password")}>
+            <span class="hero-eye size-5"></span>
+          </button>
+        </div>
+        {%if @hint != ""}
+          <p class="auth-hint">{@hint}</p>
+        {/if}
+      </div>
       """
     end
   end
@@ -197,10 +243,10 @@ defmodule RecipeAppWebHologram.HologramCoreComponents do
 
     def template do
       ~HOLO"""
-      <a href="/" class="home-brand" aria-label="ENC Recipes home">
+      <div class="home-brand" aria-label="ENC Recipes">
         <img src="/images/home/chef-hat.svg" width="28" height="28" alt="" />
         <span>ENC <span class="home-brand-accent">Recipes</span></span>
-      </a>
+      </div>
       """
     end
   end
