@@ -28,7 +28,7 @@ defmodule RecipeAppWebHologram.Pages.AuthPageCommandsTest do
   end
 
   defp reset_token_for(email) do
-    assert :ok = Accounts.request_password_reset(email)
+    assert {:ok, 300} = Accounts.request_password_reset(email)
     test_pid = self()
 
     assert_email_sent(fn message ->
@@ -263,7 +263,12 @@ defmodule RecipeAppWebHologram.Pages.AuthPageCommandsTest do
       )
 
     assert server.next_action
+    assert server.next_action.params.cooldown_seconds == 300
     assert_email_sent(fn message -> message.to == [{"reset-request", user.email}] end)
+
+    assert {:ok, remaining} = Accounts.request_password_reset(user.email)
+    assert remaining in 1..300
+    refute_email_sent()
 
     unknown =
       ForgotPassword.command(
@@ -273,6 +278,24 @@ defmodule RecipeAppWebHologram.Pages.AuthPageCommandsTest do
       )
 
     assert unknown.next_action
+    assert unknown.next_action.params.cooldown_seconds == 300
+  end
+
+  test "password reset cooldown is enforced by the accounts context" do
+    user = register_user(%{"username" => "cooldown-user", "email" => "cooldown@example.com"})
+
+    assert {:ok, 300} = Accounts.request_password_reset(user.email)
+    assert_email_sent()
+
+    sent_at = DateTime.add(DateTime.utc_now(), -240, :second) |> DateTime.truncate(:second)
+
+    user
+    |> Ecto.Changeset.change(password_reset_sent_at: sent_at)
+    |> Repo.update!()
+
+    assert {:ok, remaining} = Accounts.request_password_reset(user.email)
+    assert remaining in 1..60
+    refute_email_sent()
   end
 
   test "reset password command rejects mismatched passwords and invalid tokens" do

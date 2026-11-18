@@ -97,35 +97,81 @@ defmodule RecipeApp.Accounts do
   end
 
   @password_reset_max_age_seconds 60 * 60
+  @password_reset_cooldown_seconds 5 * 60
 
   @doc """
   Requests a password reset. The response is intentionally the same whether or
   not the email exists, preventing account enumeration.
+
+  Returns the number of seconds until another request may be made.
   """
   def request_password_reset(email) do
     normalized_email = RecipeApp.Accounts.UserValidation.normalize_email(email)
+    now = DateTime.utc_now() |> DateTime.truncate(:second)
+
+    Repo.transaction(fn ->
+      user =
+        Repo.one(
+          from user in User,
+            where: user.email == ^normalized_email,
+            lock: "FOR UPDATE"
+        )
+
+      case user do
+        nil ->
+          @password_reset_cooldown_seconds
+
+        %{password_reset_sent_at: %DateTime{} = sent_at} = user ->
+          remaining =
+            @password_reset_cooldown_seconds - DateTime.diff(now, sent_at, :second)
+
+          if remaining > 0 do
+            remaining
+          else
+            deliver_password_reset(user, now)
+          end
+
+        user ->
+          deliver_password_reset(user, now)
+      end
+    end)
+    |> case do
+      {:ok, remaining} -> {:ok, remaining}
+      {:error, reason} -> {:error, reason}
+    end
+  end
+
+  @doc """
+  Returns the remaining password-reset cooldown for an email address.
+  """
+  def password_reset_cooldown(email) do
+    normalized_email = RecipeApp.Accounts.UserValidation.normalize_email(email)
+    now = DateTime.utc_now() |> DateTime.truncate(:second)
 
     case Repo.get_by(User, email: normalized_email) do
-      nil ->
-        :ok
+      %{password_reset_sent_at: %DateTime{} = sent_at} ->
+        max(@password_reset_cooldown_seconds - DateTime.diff(now, sent_at, :second), 0)
 
-      user ->
-        token = :crypto.strong_rand_bytes(32) |> Base.url_encode64(padding: false)
-        now = DateTime.utc_now() |> DateTime.truncate(:second)
-
-        user
-        |> change(%{
-          password_reset_token_hash: hash_reset_token(token),
-          password_reset_sent_at: now
-        })
-        |> Repo.update!()
-
-        user
-        |> Email.password_reset_email(token)
-        |> Mailer.deliver()
-
-        :ok
+      _user ->
+        0
     end
+  end
+
+  defp deliver_password_reset(user, now) do
+    token = :crypto.strong_rand_bytes(32) |> Base.url_encode64(padding: false)
+
+    user
+    |> change(%{
+      password_reset_token_hash: hash_reset_token(token),
+      password_reset_sent_at: now
+    })
+    |> Repo.update!()
+
+    user
+    |> Email.password_reset_email(token)
+    |> Mailer.deliver()
+
+    @password_reset_cooldown_seconds
   end
 
   @doc """

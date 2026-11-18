@@ -74,8 +74,31 @@ defmodule RecipeAppWeb.AuthControllerTest do
 
     assert json_response(conn, 200) == %{
              "message" =>
-               "If an account exists for that email, a password reset link has been sent."
+               "If an account exists for that email, a password reset link has been sent.",
+             "cooldown_seconds" => 300
            }
+  end
+
+  test "password reset cooldown endpoint returns the remaining server-side cooldown", %{conn: conn} do
+    {:ok, user} =
+      RecipeApp.Accounts.register_user(%{
+        "username" => "cooldown-check",
+        "email" => "cooldown-check@example.com",
+        "password" => "password123"
+      })
+
+    conn =
+      post(conn, ~p"/api/v1/auth/password-reset-cooldown", %{"email" => user.email})
+
+    assert json_response(conn, 200) == %{"cooldown_seconds" => 0}
+
+    assert {:ok, 300} = RecipeApp.Accounts.request_password_reset(user.email)
+
+    conn =
+      post(build_conn(), ~p"/api/v1/auth/password-reset-cooldown", %{"email" => user.email})
+
+    assert %{"cooldown_seconds" => remaining} = json_response(conn, 200)
+    assert remaining in 1..300
   end
 
   test "reset password requires a token and password", %{conn: conn} do
@@ -216,7 +239,7 @@ defmodule RecipeAppWeb.AuthControllerTest do
 
     assert get_session(login_conn, :auth_version) == user.auth_version
 
-    assert :ok = RecipeApp.Accounts.request_password_reset(user.email)
+    assert {:ok, 300} = RecipeApp.Accounts.request_password_reset(user.email)
 
     test_pid = self()
 
@@ -292,7 +315,7 @@ defmodule RecipeAppWeb.AuthControllerTest do
 
     assert get_session(stale_session, :user_id) == user.id
 
-    assert :ok = RecipeApp.Accounts.request_password_reset(user.email)
+    assert {:ok, 300} = RecipeApp.Accounts.request_password_reset(user.email)
 
     test_pid = self()
 

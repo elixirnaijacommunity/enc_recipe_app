@@ -81,6 +81,8 @@ defmodule RecipeAppWebHologram.Pages.AuthPagesTest do
     assert markup =~ "Reset your password"
     assert markup =~ "Send reset link"
     assert markup =~ "Back to log in"
+    refute markup =~ "Check your inbox"
+    refute markup =~ "EmailVerification"
   end
 
   test "shared button displays a loader and disables itself while loading" do
@@ -159,9 +161,18 @@ defmodule RecipeAppWebHologram.Pages.AuthPagesTest do
     assert markup =~ "loading-spinner"
     assert markup =~ "disabled"
 
-    component = ForgotPassword.action(:reset_requested, %{}, component)
+    component =
+      ForgotPassword.action(:reset_requested, %{cooldown_seconds: 300}, component)
+
     refute component.state.loading
     assert component.state.submitted
+    assert component.state.cooldown_seconds == 300
+
+    markup = render_markup(ForgotPassword.template(), component.state)
+    assert markup =~ "Request received"
+    assert markup =~ "If an account exists for that email"
+    assert markup =~ ~s(data-reset-countdown="300")
+    assert markup =~ "disabled"
   end
 
   test "password update enters loading and clears it after a failure" do

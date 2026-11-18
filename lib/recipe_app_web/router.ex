@@ -25,6 +25,7 @@ defmodule RecipeAppWeb.Router do
     post "/auth/login", AuthController, :login
     get "/auth/verify-email", AuthController, :verify_email
     post "/auth/forgot-password", AuthController, :forgot_password
+    post "/auth/password-reset-cooldown", AuthController, :password_reset_cooldown
     post "/auth/reset-password", AuthController, :reset_password
   end
 
