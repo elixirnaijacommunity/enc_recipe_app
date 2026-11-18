@@ -79,7 +79,9 @@ defmodule RecipeAppWeb.AuthControllerTest do
            }
   end
 
-  test "password reset cooldown endpoint returns the remaining server-side cooldown", %{conn: conn} do
+  test "password reset cooldown endpoint returns the remaining server-side cooldown", %{
+    conn: conn
+  } do
     {:ok, user} =
       RecipeApp.Accounts.register_user(%{
         "username" => "cooldown-check",

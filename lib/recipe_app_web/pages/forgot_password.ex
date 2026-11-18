@@ -79,6 +79,7 @@ defmodule RecipeAppWebHologram.Pages.ForgotPassword do
   defp format_cooldown(seconds) do
     minutes = div(seconds, 60)
     remaining_seconds = rem(seconds, 60)
+
     "#{String.pad_leading(Integer.to_string(minutes), 2, "0")}:#{String.pad_leading(Integer.to_string(remaining_seconds), 2, "0")}"
   end
 
