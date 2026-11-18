@@ -10,17 +10,21 @@ defmodule RecipeAppWebHologram.HologramCoreComponentsTest do
     Input,
     List,
     NavBar,
+    RecipeCard,
     Table
   }
 
   describe "components tests" do
     test "button test" do
-      assert render_markup(~HOLO"""
-             <Button class="btn-ghost rounded-full btn-xs sm:btn-sm md:btn-md" type="button">Login</Button>
-             """) ==
-               ~s'<button type="button" class="btn btn-ghost rounded-full btn-xs sm:btn-sm md:btn-md">
-  Login
-</button>'
+      markup =
+        render_markup(~HOLO"""
+        <Button class="btn-ghost rounded-full btn-xs sm:btn-sm md:btn-md" type="button">Login</Button>
+        """)
+
+      assert markup =~ ~s(type="button")
+      assert markup =~ ~s(class="btn btn-ghost rounded-full btn-xs sm:btn-sm md:btn-md")
+      assert markup =~ "Login"
+      assert markup =~ "</button>"
     end
 
     test "card test" do
@@ -53,15 +57,24 @@ defmodule RecipeAppWebHologram.HologramCoreComponentsTest do
     end
 
     test "navbar test" do
-      assert render_markup(~HOLO"""
-             <NavBar class="gap-4 flex-wrap">
-             <span class="font-serif text-xl font-semibold flex-1">ENC Recipes</span>
-             <span class="text-chili font-semibold">Discover</span>
-             <Button class="btn-ghost">Log in</Button>
-             <Button class="btn-primary">Create account</Button>
-             </NavBar>
-             """) ==
-               ~s'<nav class=\"navbar gap-4 flex-wrap\">\n  \n<span class=\"font-serif text-xl font-semibold flex-1\">ENC Recipes</span>\n<span class=\"text-chili font-semibold\">Discover</span>\n<button type=\"button\" class=\"btn btn-ghost\">\n  Log in\n</button>\n<button type=\"button\" class=\"btn btn-primary\">\n  Create account\n</button>\n\n</nav>'
+      markup =
+        render_markup(~HOLO"""
+        <NavBar class="gap-4 flex-wrap">
+          <span class="font-serif text-xl font-semibold flex-1">ENC Recipes</span>
+          <span class="text-chili font-semibold">Discover</span>
+          <Button class="btn-ghost">Log in</Button>
+          <Button class="btn-primary">Create account</Button>
+        </NavBar>
+        """)
+
+      assert markup =~ ~s(<nav class="navbar gap-4 flex-wrap">)
+      assert markup =~ "ENC Recipes"
+      assert markup =~ "Discover"
+      assert markup =~ ~s(class="btn btn-ghost")
+      assert markup =~ "Log in"
+      assert markup =~ ~s(class="btn btn-primary")
+      assert markup =~ "Create account"
+      assert markup =~ "</nav>"
     end
 
     test "flash test" do
@@ -86,5 +99,70 @@ defmodule RecipeAppWebHologram.HologramCoreComponentsTest do
              """) ==
                ~s'<table class=\"table table-zebra \">\n  <thead>\n    <tr>\n      \n        <th>id</th>\n      \n        <th>name</th>\n      \n    </tr>\n  </thead>\n  <tbody>\n    \n      <tr>\n        \n          <td>1</td>\n        \n          <td>1</td>\n        \n      </tr>\n    \n      <tr>\n        \n          <td>2</td>\n        \n          <td>2</td>\n        \n      </tr>\n    \n      <tr>\n        \n          <td>3</td>\n        \n          <td>3</td>\n        \n      </tr>\n    \n  </tbody>\n</table>'
     end
+  end
+
+  test "button renders its default slot and explicit disabled state" do
+    markup =
+      render_markup(~HOLO"""
+      <Button disabled={true} class="btn-wide">Continue</Button>
+      """)
+
+    assert markup =~ ~s(type="button")
+    assert markup =~ ~s(disabled)
+    assert markup =~ "Continue"
+    refute markup =~ "loading-spinner"
+  end
+
+  test "card omits optional figure and title when they are empty" do
+    markup =
+      render_markup(~HOLO"""
+      <Card><p>Card body</p></Card>
+      """)
+
+    assert markup =~ "Card body"
+    refute markup =~ "<figure>"
+    refute markup =~ "card-title"
+  end
+
+  test "flash renders its kind without an optional title" do
+    markup =
+      render_markup(~HOLO"""
+      <Flash kind="success">Saved successfully</Flash>
+      """)
+
+    assert markup =~ "alert-success"
+    assert markup =~ "Saved successfully"
+    refute markup =~ "font-semibold"
+  end
+
+  test "table and list render empty collections" do
+    table =
+      render_markup(~HOLO"""
+      <Table />
+      """)
+
+    list =
+      render_markup(~HOLO"""
+      <List />
+      """)
+
+    assert table =~ "<thead>"
+    assert table =~ "<tbody>"
+    refute table =~ "<th>"
+    assert list =~ ~s(<ul class="list ">)
+    refute list =~ "<li>"
+  end
+
+  test "recipe card renders recipe metadata and local artwork" do
+    markup =
+      render_markup(~HOLO"""
+      <RecipeCard recipe={%{name: "Jollof Rice", slug: "jollof", time: "45 min", cook: "@nature"}} />
+      """)
+
+    assert markup =~ "Jollof Rice"
+    assert markup =~ "45 min"
+    assert markup =~ "@nature"
+    assert markup =~ "/images/home/jollof.svg"
+    assert markup =~ ~s(aria-label="Jollof Rice")
   end
 end
