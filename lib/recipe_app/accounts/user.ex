@@ -12,6 +12,9 @@ defmodule RecipeApp.Accounts.User do
     field :password, :string, virtual: true
     field :status, :string, default: "pending"
     field :email_verified_at, :utc_datetime
+    field :password_reset_token_hash, :string
+    field :password_reset_sent_at, :utc_datetime
+    field :auth_version, :integer, default: 0
 
     timestamps(type: :utc_datetime)
   end
@@ -39,6 +42,17 @@ defmodule RecipeApp.Accounts.User do
     |> unique_constraint(:username)
     |> unique_constraint(:email)
     |> hash_password
+  end
+
+  def password_reset_changeset(user, attrs) do
+    user
+    |> cast(attrs, [:password])
+    |> validate_required([:password])
+    |> validate_length(:password, min: 8)
+    |> hash_password()
+    |> put_change(:password_reset_token_hash, nil)
+    |> put_change(:password_reset_sent_at, nil)
+    |> put_change(:auth_version, (user.auth_version || 0) + 1)
   end
 
   defp hash_password(changeset) do
