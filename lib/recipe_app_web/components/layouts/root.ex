@@ -19,6 +19,7 @@ defmodule RecipeAppWebHologram.Layouts.Root do
       </head>
       <body>
         <slot />
+        <script type="module" src="/assets/js/reset_password.js"></script>
       </body>
     </html>
     """

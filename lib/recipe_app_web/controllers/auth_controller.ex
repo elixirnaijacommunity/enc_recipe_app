@@ -91,14 +91,23 @@ defmodule RecipeAppWeb.AuthController do
   """
 
   def forgot_password(conn, %{"email" => email}) do
-    :ok = Accounts.request_password_reset(email)
+    {:ok, cooldown_seconds} = Accounts.request_password_reset(email)
 
     json(conn, %{
-      message: "If an account exists for that email, a password reset link has been sent."
+      message: "If an account exists for that email, a password reset link has been sent.",
+      cooldown_seconds: cooldown_seconds
     })
   end
 
   def forgot_password(conn, _params) do
+    conn |> put_status(:bad_request) |> json(%{error: "Email is required"})
+  end
+
+  def password_reset_cooldown(conn, %{"email" => email}) do
+    json(conn, %{cooldown_seconds: Accounts.password_reset_cooldown(email)})
+  end
+
+  def password_reset_cooldown(conn, _params) do
     conn |> put_status(:bad_request) |> json(%{error: "Email is required"})
   end
 

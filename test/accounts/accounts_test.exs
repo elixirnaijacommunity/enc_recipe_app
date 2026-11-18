@@ -22,7 +22,7 @@ defmodule RecipeApp.AccountsTest do
     user = create_user()
     test_pid = self()
 
-    assert :ok = Accounts.request_password_reset(user.email)
+    assert {:ok, 300} = Accounts.request_password_reset(user.email)
 
     assert_email_sent(fn email ->
       send(test_pid, {:reset_email, email})
@@ -48,8 +48,17 @@ defmodule RecipeApp.AccountsTest do
     assert authenticated_user.id == user.id
   end
 
+  test "password reset cooldown can be retrieved when returning to the page" do
+    user = create_user()
+
+    assert Accounts.password_reset_cooldown(user.email) == 0
+    assert {:ok, 300} = Accounts.request_password_reset(user.email)
+    assert Accounts.password_reset_cooldown(user.email) in 1..300
+    assert Accounts.password_reset_cooldown("missing@example.com") == 0
+  end
+
   test "password reset request does not disclose unknown email addresses" do
-    assert :ok = Accounts.request_password_reset("missing@example.com")
+    assert {:ok, 300} = Accounts.request_password_reset("missing@example.com")
   end
 
   test "password reset rejects invalid and expired tokens" do
@@ -69,7 +78,7 @@ defmodule RecipeApp.AccountsTest do
 
   test "password reset enforces the minimum password length" do
     user = create_user()
-    assert :ok = Accounts.request_password_reset(user.email)
+    assert {:ok, 300} = Accounts.request_password_reset(user.email)
     test_pid = self()
 
     assert_email_sent(fn email ->
