@@ -8,7 +8,6 @@ defmodule RecipeAppWebHologram.Pages.AuthPageCommandsTest do
   alias RecipeApp.Repo
 
   alias RecipeAppWebHologram.Middleware.ValidateSession
-
   alias RecipeAppWebHologram.Pages.{ForgotPassword, Login, Register, ResetPassword}
 
   defp register_user(attrs) do
